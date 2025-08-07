@@ -7,10 +7,13 @@ import Signup from './pages/Signup';
 import Signin from './pages/Signin';
 import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
-import AuthCallback from './utils/AuthCallback';
+import AuthCallback from './pages/AuthCallback';
 
 // Page components
 import Home from './pages/Home';
+import Profile from './pages/Profile';
+import Loader from './components/Loader';
+import Footer from './components/Footer';
 
 const About = () => (
   <div className="container mx-auto p-4">
@@ -93,8 +96,11 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/loader" element={<Loader />} />
           </Routes>
         </main>
+        <Footer/>
       </BrowserRouter>
     </AuthProvider>
   )

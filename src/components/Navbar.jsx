@@ -114,7 +114,7 @@ const Navbar = () => {
                 )}
                 <Link
                   to="/profile"
-                  className="ml-2 p-2 rounded-full border border-secondary-200 dark:border-secondary-600 bg-secondary-50 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-600 transition-colors"
+                  className="ml-2 p- rounded-full border border-secondary-200 dark:border-secondary-600 bg-secondary-50 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-600 transition-colors"
                   aria-label="Profile"
                   title="My Profile"
                 >
@@ -122,7 +122,7 @@ const Navbar = () => {
                     <img 
                       src={user.user_metadata.avatar_url} 
                       alt="Profile" 
-                      className="w-5 h-5 rounded-full"
+                      className="w-7 h-7 rounded-full"
                     />
                   ) : (
                     <svg

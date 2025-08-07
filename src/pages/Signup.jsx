@@ -10,7 +10,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("learner");
+  const [role, setRole] = useState("");
   const [signupMethod, setSignupMethod] = useState("email");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -18,7 +18,7 @@ function Signup() {
 
   // Use the auth context
   const { signUpWithEmail, signInWithGoogle, loading } = useAuth();
-
+console.log(role);
   // Handle Google sign-in
   const handleGoogleSignup = async () => {
     // Validate that a role is selected
@@ -96,12 +96,12 @@ function Signup() {
           <p className="mt-2 text-xl text-secondary-600">
             Join Drivigo and start your driving journey
           </p>
-          <DotLottieReact
+          {/* <DotLottieReact
             src="https://lottie.host/2cf086ab-daac-4fa9-b586-52738cb89a9d/1hYr1QxIOR.lottie"
             loop
             autoplay
             className="h-96"
-          />
+          /> */}
         </div>
         
         {/* Right side - Signup form */}
