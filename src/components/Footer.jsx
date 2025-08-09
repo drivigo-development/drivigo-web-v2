@@ -19,7 +19,7 @@ function Footer() {
     try {
       setLoading(true);
       
-      const response = await fetch("http://localhost:5001/subscribe", {
+      const response = await fetch("https://drivigo-server-v2.vercel.app/subscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

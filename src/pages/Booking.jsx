@@ -8,7 +8,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
 // Define API URL
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+const apiUrl = import.meta.env.VITE_API_URL || "https://drivigo-server-v2.vercel.app";
 
 // Libraries for Google Maps - defined outside component to prevent reloading
 const libraries = ["places"];
@@ -637,7 +637,8 @@ function BookingPage() {
                       start_date: bookingDetails.startDate,
                       end_date: bookingDetails.endDate,
                       time_slots: bookingDetails.selectedTimeSlots, // This will be converted to JSONB
-                      razorpay_payment_id: paymentId
+                      razorpay_payment_id: paymentId,
+                      amount: amount // Include the booking amount
                       // purchased_date will use DEFAULT current_date
                       // booking_id will use DEFAULT uuid_generate_v4()
                     }
