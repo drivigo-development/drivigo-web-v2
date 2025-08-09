@@ -58,14 +58,12 @@ const Navbar = () => {
           <div className="flex-shrink-0">
             <Link
               to="/"
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 text-2xl text-black font-extrabold"
               onClick={closeMobileMenu}
             >
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">D</span>
-              </div>
-              <span className="font-display font-bold text-xl text-gradient">
-                Drivigo
+              Drivi
+              <span className="font-display  text-gradient">
+                go
               </span>
             </Link>
           </div>

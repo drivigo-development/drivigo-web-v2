@@ -87,13 +87,13 @@ console.log(role);
 
   return (
     <div className="min-h-[92dvh] bg-gradient-to-br from-primary-50 dark:from-primary-900 to-secondary-50 dark:to-secondary-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-center w-full mx-24">
+      <div className="lg:flex justify-between items-center w-full lg:mx-24">
         {/* Left side - Illustration */}
         <div className="text-center">
-          <h2 className="text-5xl font-display font-bold text-primary-600 mb-4">
+          <h2 className="lg:text-5xl text-3xl font-display font-bold text-primary-600 mb-4">
             Create your account
           </h2>
-          <p className="mt-2 text-xl text-secondary-600">
+          <p className="mt-2 lg:text-xl text-lg text-secondary-600 mb-4 lg:mb-0">
             Join Drivigo and start your driving journey
           </p>
           {/* <DotLottieReact
@@ -105,7 +105,7 @@ console.log(role);
         </div>
         
         {/* Right side - Signup form */}
-        <div className="max-w-[29rem] w-full space-y-8">
+        <div className="lg:max-w-[29rem]  w-full space-y-8">
           <div className="bg-white rounded-lg shadow-soft border border-secondary-200 p-6">
             {/* Signup method toggle */}
             <div className="mb-6">

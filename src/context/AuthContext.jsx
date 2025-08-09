@@ -42,9 +42,9 @@ export const AuthProvider = ({ children }) => {
               user.email.split('@')[0] || 'User' // Name is required, provide fallback
       };
       
-      console.log('Role from user metadata:', user.user_metadata?.role);
-      console.log('Role from passed metadata:', metadata.role);
-      console.log('Final role being used:', userData.role);
+      // console.log('Role from user metadata:', user.user_metadata?.role);
+      // console.log('Role from passed metadata:', metadata.role);
+      // console.log('Final role being used:', userData.role);
       
       // Add optional fields for profile image
       if (user.user_metadata) {
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
                              metadata.profile_img || null;
       }
       
-      console.log(`Inserting ${isGoogleAuth ? 'Google' : 'email'} user data:`, userData);
+      // console.log(`Inserting ${isGoogleAuth ? 'Google' : 'email'} user data:`, userData);
       
       // Insert user data into users table
       const { data, error } = await supabase
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
         return { data: null, error };
       }
       
-      console.log('Successfully inserted/updated user data:', data);
+      // console.log('Successfully inserted/updated user data:', data);
       return { data, error: null };
     } catch (err) {
       console.error('Exception in insertUserToDatabase:', err);
@@ -88,13 +88,13 @@ export const AuthProvider = ({ children }) => {
         // Set up auth state change listener
         const { data: authListener } = supabase.auth.onAuthStateChange(
           async (event, session) => {
-            console.log('Auth state changed:', event, session?.user?.id);
+            // console.log('Auth state changed:', event, session?.user?.id);
             setSession(session);
             setUser(session?.user || null);
             
             // Handle sign-in events
             if (event === 'SIGNED_IN' && session?.user) {
-              console.log('User signed in:', session.user);
+              // console.log('User signed in:', session.user);
               
               // Always insert user data on sign in to ensure it exists
               const { error: insertError } = await insertUserToDatabase(session.user);
@@ -219,11 +219,11 @@ export const AuthProvider = ({ children }) => {
       
       // Get the role from options
       const { role } = options;
-      console.log('Google callback with role from URL:', role);
+      // console.log('Google callback with role from URL:', role);
       
       if (role) {
         // Update the user metadata with the role
-        console.log('Updating user metadata with role:', role);
+        // console.log('Updating user metadata with role:', role);
         const { error: updateError } = await supabase.auth.updateUser({
           data: { role }
         });
@@ -233,7 +233,7 @@ export const AuthProvider = ({ children }) => {
           return { error: updateError };
         }
         
-        console.log('Successfully updated user metadata with role:', role);
+        // console.log('Successfully updated user metadata with role:', role);
         
         // Get the updated session after metadata update
         const { data: updatedSession, error: refreshError } = await supabase.auth.getSession();
@@ -254,7 +254,7 @@ export const AuthProvider = ({ children }) => {
           return { error: insertError };
         }
         
-        console.log('Successfully handled Google callback and inserted user data with role:', role);
+        // console.log('Successfully handled Google callback and inserted user data with role:', role);
         return { success: true };
       } else {
         console.error('No role provided in callback');

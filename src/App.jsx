@@ -14,6 +14,8 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Loader from './components/Loader';
 import Footer from './components/Footer';
+import Dashboard from './pages/Dashboard';
+import BookingPage from './pages/Booking';
 
 const About = () => (
   <div className="container mx-auto p-4">
@@ -98,6 +100,8 @@ function App() {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/loader" element={<Loader />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/booking" element={<BookingPage />} />
           </Routes>
         </main>
         <Footer/>
