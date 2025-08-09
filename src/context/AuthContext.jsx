@@ -221,6 +221,16 @@ export const AuthProvider = ({ children }) => {
       const { role } = options;
       // console.log('Google callback with role from URL:', role);
       
+      // Check if this is a new user (sign up) or existing user (sign in)
+      const { data: existingUser, error: userCheckError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', sessionData.session.user.id)
+        .single();
+      
+      // If user exists, this is a sign-in, and we don't need a role
+      const isSignIn = !userCheckError && existingUser;
+      
       if (role) {
         // Update the user metadata with the role
         // console.log('Updating user metadata with role:', role);
@@ -256,9 +266,21 @@ export const AuthProvider = ({ children }) => {
         
         // console.log('Successfully handled Google callback and inserted user data with role:', role);
         return { success: true };
+      } else if (isSignIn) {
+        // This is a sign-in for an existing user, so we don't need a role
+        // Just insert/update the user data with whatever metadata we have
+        const { error: insertError } = await insertUserToDatabase(sessionData.session.user);
+        
+        if (insertError) {
+          console.error('Error inserting user data during sign-in callback:', insertError);
+          return { error: insertError };
+        }
+        
+        return { success: true };
       } else {
-        console.error('No role provided in callback');
-        return { error: new Error('No role provided in callback') };
+        // This is a new user (sign-up) but no role was provided
+        console.error('No role provided for new user during sign-up');
+        return { error: new Error('No role provided for new user') };
       }
     } catch (err) {
       console.error('Error in Google callback handler:', err);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../utils/supabaseClient';
-import { Pencil, Save, X, Award, Book, Clock, Calendar, User } from 'lucide-react';
+import { Pencil, Save, X, Award, Book, Clock, Calendar, User, MapPin, Phone } from 'lucide-react';
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import Loader from '../components/Loader';
 import Instructor_Details from '../components/Instructor_Details';
@@ -24,6 +24,8 @@ const Profile = () => {
   });
 
   const [userRole, setUserRole] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -33,6 +35,11 @@ const Profile = () => {
       const role = user.user_metadata?.role || 'user';
       setUserRole(role);
       console.log('User role from auth metadata:', role);
+      
+      // Fetch bookings if user is a learner
+      if (role === 'learner') {
+        fetchBookings();
+      }
     }
   }, [user]);
 
@@ -65,33 +72,50 @@ const Profile = () => {
     }
   };
 
-  const fetchLessons = async () => {
+  const fetchBookings = async () => {
     try {
-      const userRole = profile?.role || user.user_metadata?.role;
-      let query;
+      setLoadingBookings(true);
       
-      // This is a placeholder - you would need to create this table
-      if (userRole === 'instructor') {
-        // For instructors, get lessons they're teaching
-        query = supabase
-          .from('lessons')
-          .select('*')
-          .eq('instructor_id', user.id)
-          .order('scheduled_date', { ascending: false });
-      } else {
-        // For learners, get lessons they're taking
-        query = supabase
-          .from('lessons')
-          .select('*')
-          .eq('learner_id', user.id)
-          .order('scheduled_date', { ascending: false });
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setLessons(data || []);
+      // Get all bookings for the learner
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('*, instructor_id')
+        .eq('learner_id', user.id)
+        .order('start_date', { ascending: false });
+      
+      if (bookingsError) throw bookingsError;
+      
+      // For each booking, get instructor details
+      const bookingsWithDetails = await Promise.all(bookingsData.map(async (booking) => {
+        // Get instructor details
+        const { data: instructorData, error: instructorError } = await supabase
+          .from('users')
+          .select('name, phone')
+          .eq('id', booking.instructor_id)
+          .single();
+          
+        if (instructorError) {
+          console.error('Error fetching instructor details:', instructorError);
+          return {
+            ...booking,
+            instructorName: 'Unknown',
+            instructorPhone: 'N/A'
+          };
+        }
+        
+        return {
+          ...booking,
+          instructorName: instructorData.name,
+          instructorPhone: instructorData.phone || 'N/A'
+        };
+      }));
+      
+      setBookings(bookingsWithDetails || []);
     } catch (error) {
-      console.error('Error fetching lessons:', error);
+      console.error('Error fetching bookings:', error);
+      toast.error('Failed to load bookings');
+    } finally {
+      setLoadingBookings(false);
     }
   };
 
@@ -215,6 +239,7 @@ const Profile = () => {
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Personal Information</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Personal Info - Left Column */}
                   <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <div className="mt-2 space-y-2">
                       <p className="text-gray-800 dark:text-white"><span className="font-bold">Name:</span> {profile.name || 'Not provided'}</p>
@@ -225,8 +250,100 @@ const Profile = () => {
                       <p className="text-gray-800 dark:text-white"><span className="font-bold">Role:</span> {profile.role || userRole || 'Not provided'}</p>
                     </div>
                   </div>
+                  
+                  {/* Bookings - Right Column (Only for learners) */}
+                  {userRole === 'learner' ? (
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                      <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">Your Bookings</h3>
+                      
+                      {loadingBookings ? (
+                        <div className="flex justify-center py-4">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                        </div>
+                      ) : bookings.length > 0 ? (
+                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+                          {bookings.map((booking, index) => {
+                            const startDate = new Date(booking.start_date);
+                            const endDate = new Date(booking.end_date);
+                            const isActive = new Date() <= endDate;
+                            
+                            return (
+                              <div key={booking.id} className="border border-gray-200 rounded-md p-4 bg-white shadow-sm">
+                                <div className="flex justify-between items-center mb-3">
+                                  <div className="flex items-center">
+                                    <Calendar className="flex-shrink-0 h-5 w-5 text-primary-500 mr-2" />
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} - {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </div>
+                                  </div>
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                    {isActive ? 'Active' : 'Completed'}
+                                  </span>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 gap-2 text-sm">
+                                  <div className="flex items-center">
+                                    <User className="flex-shrink-0 h-4 w-4 text-primary-500 mr-2" />
+                                    <span className="text-gray-700 font-medium">Instructor:</span>
+                                    <span className="ml-2 text-gray-900">{booking.instructorName}</span>
+                                  </div>
+                                  
+                                  <div className="flex items-center">
+                                    <Phone className="flex-shrink-0 h-4 w-4 text-primary-500 mr-2" />
+                                    <span className="text-gray-700 font-medium">Contact:</span>
+                                    <span className="ml-2 text-gray-900">{booking.instructorPhone}</span>
+                                  </div>
+                                  
+                                  {booking.learner_plan && (
+                                    <div className="flex items-center">
+                                      <Award className="flex-shrink-0 h-4 w-4 text-primary-500 mr-2" />
+                                      <span className="text-gray-700 font-medium">Plan:</span>
+                                      <span className="ml-2 text-gray-900">{booking.learner_plan}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {booking.time_slots && booking.time_slots.length > 0 && (
+                                  <div className="mt-3 flex items-center gap-2 border-t border-gray-100 pt-3">
+                                    <div className="flex items-center mb-2">
+                                      <Clock className="flex-shrink-0 h-4 w-4 text-primary-500 mr-2" />
+                                      <span className="text-gray-700 font-medium">Time Slots:</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1  mb-2">
+                                      {booking.time_slots.map((slot, i) => (
+                                        <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
+                                          {slot}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <p className="text-gray-500 text-sm">No bookings found.</p>
+                          <a href="/booking" className="text-primary-600 hover:text-primary-800 text-sm block mt-1">
+                            Book a lesson now!
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                      <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">Account Status</h3>
+                      <div className="space-y-2">
+                        <p className="text-gray-800 dark:text-white"><span className="font-bold">Account Type:</span> Instructor</p>
+                        <p className="text-gray-800 dark:text-white"><span className="font-bold">Status:</span> <span className="text-green-600">Active</span></p>
+                        <p className="text-gray-800 dark:text-white"><span className="font-bold">Member Since:</span> {new Date(user?.created_at || Date.now()).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+              
               {/* Instructor Details Component - Only shown for instructors */}
               {userRole === 'instructor' && (
                 <div className="mb-2">

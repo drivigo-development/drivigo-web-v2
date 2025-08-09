@@ -32,7 +32,7 @@ export default function AuthCallback() {
         toast.success('Successfully signed in!');
         
         // Redirect to dashboard on success
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       } catch (err) {
         console.error('Exception in auth callback:', err);
         toast.error(`Authentication error: ${err.message}`);
