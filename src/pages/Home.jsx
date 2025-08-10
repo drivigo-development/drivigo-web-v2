@@ -91,20 +91,20 @@ function Home() {
               >
                 <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link 
-                    to="/book-lesson" 
+                    to="/signup" 
                     className="btn-primary text-lg px-8 py-4 inline-block"
                   >
                     Book Your First Lesson
                   </Link>
                 </motion.div>
-                <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                {/* <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link 
                     to="/about" 
                     className="btn-secondary text-lg px-8 py-4 inline-block"
                   >
                     Learn More
                   </Link>
-                </motion.div>
+                </motion.div> */}
               </motion.div>
             </motion.div>
 
@@ -213,7 +213,7 @@ function Home() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={fadeIn}
-        className="py-20 bg-gradient-primary "
+        className="py-20 bg-primary-500 "
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2 
@@ -222,19 +222,13 @@ function Home() {
           >
             Ready to Start Your Driving Journey?
           </motion.h2>
-          <motion.p 
-            variants={fadeIn}
-            className="text-xl text-primary-100 mb-8"
-          >
-            Join thousands of satisfied learners who have mastered driving with Drivigo
-          </motion.p>
           <motion.div
             variants={fadeIn}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <Link 
-              to="/book-lesson" 
+              to="/signup" 
               className="btn-secondary text-lg px-8 py-4 inline-block"
             >
               Book Your First Lesson

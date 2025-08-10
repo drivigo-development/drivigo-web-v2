@@ -366,7 +366,7 @@ const Navbar = () => {
       {/* Theme Toggle Button */}
       <button
               onClick={toggleTheme}
-              className="fixed right-10 bottom-10 p-2 rounded-full border border-secondary-200 dark:border-secondary-600 bg-secondary-50 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-600 transition-colors"
+              className="hidden fixed right-10 bottom-10 p-2 rounded-full border border-secondary-200 dark:border-secondary-600 bg-secondary-50 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-600 transition-colors"
               aria-label="Toggle dark mode"
               title={
                 theme === "dark"

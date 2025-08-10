@@ -88,13 +88,13 @@ function About() {
         className="py-20 bg-white dark:bg-secondary-900"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-4 items-center">
             <motion.div variants={fadeIn}>
               <motion.h2 
                 variants={fadeIn}
                 className="text-3xl lg:text-5xl font-display font-bold text-secondary-900 dark:text-secondary-100 mb-6"
               >
-                Our Mission
+                Our <span className="text-primary-500">Mission</span>
               </motion.h2>
               <motion.p 
                 variants={fadeIn}
@@ -113,17 +113,17 @@ function About() {
               variants={fadeIn}
               className="relative"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-gradient-primary rounded-2xl p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-primary-500 rounded-2xl p-8">
                 <motion.div 
                   variants={fadeIn}
-                  className="text-white"
+                  className="text-white w-96"
                 >
-                  <h3 className="text-2xl text-black font-display font-bold mb-4">Why Choose Drivigo?</h3>
+                  <h3 className="text-3xl text-black font-display font-bold mb-4 w-96 ">Why Choose Drivigo?</h3>
                   <motion.ul 
                     variants={staggerContainer}
                     initial="hidden"
                     whileInView="visible"
-                    className="space-y-3"
+                    className="space-y-3 text-black"
                   >
                     <motion.li variants={fadeIn} className="flex items-center">
                       <img src="/tick_g.png" alt="Checkmark" className="w-5 h-5 mr-3" />
@@ -153,7 +153,7 @@ function About() {
                     transition={{ duration: 0.5 }}
                     src="/character_key.png" 
                     alt="Car with keys" 
-                    className="max-h-64 object-contain" 
+                    className="max-w-52 object-contain" 
                   />
                 </motion.div>
               </div>
@@ -196,7 +196,7 @@ function About() {
               variants={fadeIn}
               className="text-3xl lg:text-4xl font-display font-bold text-secondary-900 dark:text-secondary-100 mb-4"
             >
-              Our Values
+              Our <span className="text-primary-500">Values</span>
             </motion.h2>
             <motion.p 
               variants={fadeIn}
@@ -252,7 +252,7 @@ function About() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={fadeIn}
-        className="mx-24 py-20 bg-gradient-primary rounded-3xl "
+        className="mx-24 py-20 bg-primary-500 rounded-3xl mb-16"
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2 
@@ -261,12 +261,7 @@ function About() {
           >
             Ready to Start Your Driving Journey?
           </motion.h2>
-          <motion.p 
-            variants={fadeIn}
-            className="text-xl text-primary-100 mb-8"
-          >
-            Join thousands of satisfied learners who have mastered driving with Drivigo
-          </motion.p>
+
           <motion.div
             variants={fadeIn}
             whileHover={{ scale: 1.05 }}
