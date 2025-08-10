@@ -218,13 +218,13 @@ function About() {
                 key={index} 
                 variants={fadeIn}
                 whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                className="bg-white dark:bg-secondary-800 rounded-xl shadow-md p-6 text-center"
+                className="bg-white dark:bg-secondary-800  p-6 text-center"
               >
                 <motion.div 
                   initial={{ scale: 0.8, opacity: 0 }}
                   whileInView={{ scale: 1, opacity: 1 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
-                  className="mb-4 h-32 flex items-center justify-center"
+                  className="mb-4 h-24 flex items-center justify-center"
                 >
                   <img src={`${value.image}`} alt={value.title} className="h-full object-contain" />
                 </motion.div>

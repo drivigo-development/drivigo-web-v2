@@ -1,6 +1,7 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { supabaseAdmin } from '../utils/supabaseAdmin';
 import { toast } from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -121,10 +122,49 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+  // Check if email already exists using admin API
+  const checkEmailExists = async (email) => {
+    try {
+      setLoading(true);
+      
+      // Fetch all existing users (paginated) and check if the email already exists
+      const { data: usersData, error: usersError } = await supabaseAdmin.auth.admin.listUsers();
+      
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        return { exists: false, error: usersError };
+      }
+      
+      // Check if any user has the same email (case-insensitive)
+      const emailExists = (usersData?.users ?? []).some(u => 
+        (u.email ?? '').toLowerCase() === email.toLowerCase()
+      );
+      
+      return { exists: emailExists, error: null };
+    } catch (err) {
+      console.error('Error checking email:', err);
+      return { exists: false, error: err };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Sign up with email and password
   const signUpWithEmail = async (email, password, metadata = {}) => {
     try {
       setLoading(true);
+      
+      // First check if email already exists
+      const { exists, error: checkError } = await checkEmailExists(email);
+      
+      if (checkError) {
+        console.error('Error checking if email exists:', checkError);
+      }
+      
+      if (exists) {
+        return { data: null, error: new Error('This email is already registered. Please sign in instead.') };
+      }
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -353,7 +393,8 @@ export const AuthProvider = ({ children }) => {
     handleGoogleCallback,
     signOut,
     resetPassword,
-    updateUserData
+    updateUserData,
+    checkEmailExists
   };
 
   return (

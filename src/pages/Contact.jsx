@@ -164,7 +164,7 @@ function Contact() {
     {
       icon: "/email.png",
       title: "Email",
-      details: "contact@drivigo.com",
+      details: "contact@drivigo.in",
       description: "Send us an email anytime"
     },
     {

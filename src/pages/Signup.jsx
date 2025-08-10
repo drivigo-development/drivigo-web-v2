@@ -17,7 +17,7 @@ function Signup() {
   const navigate = useNavigate();
 
   // Use the auth context
-  const { signUpWithEmail, signInWithGoogle, loading } = useAuth();
+  const { signUpWithEmail, signInWithGoogle, loading, checkEmailExists } = useAuth();
 console.log(role);
   // Handle Google sign-in
   const handleGoogleSignup = async () => {
@@ -58,6 +58,25 @@ console.log(role);
     }
 
     try {
+      // First check if email already exists
+      toast.loading("Checking account...");
+      const { exists, error: checkError } = await checkEmailExists(email);
+      
+      if (checkError) {
+        toast.dismiss();
+        toast.error("Error checking account. Please try again.");
+        return;
+      }
+      
+      if (exists) {
+        toast.dismiss();
+        toast.error("This email is already registered. Please sign in instead.");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 2000);
+        return;
+      }
+      
       toast.loading("Creating your account...");
       
       // Sign up with email and password
@@ -78,9 +97,8 @@ console.log(role);
       if (error.message?.includes("already registered") || 
           error.message?.includes("already in use")) {
         toast.error("This email is already registered. Please sign in instead.");
-        setTimeout(() => navigate("/signin"), 2000);
       } else {
-        toast.error(error.message || "An error occurred during signup");
+        toast.error(error.message || "Failed to create account");
       }
     }
   };
@@ -96,12 +114,12 @@ console.log(role);
           <p className="mt-2 lg:text-xl text-lg text-secondary-600 mb-4 lg:mb-0">
             Join Drivigo and start your driving journey
           </p>
-          {/* <DotLottieReact
-            src="https://lottie.host/2cf086ab-daac-4fa9-b586-52738cb89a9d/1hYr1QxIOR.lottie"
+          <DotLottieReact
+            src="https://lottie.host/92c6e218-c7ec-405b-964e-9274e6c5d2e7/owiUUVx8Qc.lottie"
             loop
             autoplay
-            className="h-96"
-          /> */}
+            className="h-96 hidden lg:block"
+          />
         </div>
         
         {/* Right side - Signup form */}
