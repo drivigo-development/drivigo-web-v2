@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { supabase } from '../utils/supabaseClient';
-import { Pencil, Save, X, Award, Book, Clock, Calendar, User, MapPin, Phone } from 'lucide-react';
+import { Pencil, Save, X, Award, Book, Clock, Calendar, User, MapPin, Phone, Timer } from 'lucide-react';
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import Loader from '../components/Loader';
 import Instructor_Details from '../components/Instructor_Details';
@@ -26,6 +26,7 @@ const Profile = () => {
   const [userRole, setUserRole] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [instructorStatus, setInstructorStatus] = useState('pending');
 
   useEffect(() => {
     if (user) {
@@ -346,7 +347,32 @@ const Profile = () => {
                       <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-white">Account Status</h3>
                       <div className="space-y-2">
                         <p className="text-gray-800 dark:text-white"><span className="font-bold">Account Type:</span> Instructor</p>
-                        <p className="text-gray-800 dark:text-white"><span className="font-bold">Status:</span> <span className="text-green-600">Active</span></p>
+                        <p className="text-gray-800 dark:text-white flex items-center"><span className="font-bold mr-2">Status:</span> 
+                          <span 
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-sm font-medium ${instructorStatus === 'verified' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-blue-200 text-black'}`}
+                          >
+                            {instructorStatus === 'verified' ? (
+                              <>
+                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Verified
+                              </>
+                            ) : (
+                              <>
+                                <Timer className='mr-1' size={16} />
+                                Pending
+                              </>
+                            )}
+                          </span>
+                          {instructorStatus === 'pending' && (
+                            <span className="ml-2 text-sm text-gray-500">
+                              (Documents under review)
+                            </span>
+                          )}
+                        </p>
                         <p className="text-gray-800 dark:text-white"><span className="font-bold">Member Since:</span> {new Date(user?.created_at || Date.now()).toLocaleDateString()}</p>
                       </div>
                     </div>
@@ -357,7 +383,7 @@ const Profile = () => {
               {/* Instructor Details Component - Only shown for instructors */}
               {userRole === 'instructor' && (
                 <div className="mb-2">
-                  <Instructor_Details instructorId={user?.id} />
+                  <Instructor_Details instructorId={user?.id} onStatusChange={setInstructorStatus} />
                 </div>
               )}
       

@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 function About() {
+  const { user } = useAuth();
   const values = [
     {
       image: "/secure.png",
@@ -118,7 +120,7 @@ function About() {
                   variants={fadeIn}
                   className="text-white w-96"
                 >
-                  <h3 className="text-3xl text-black font-display font-bold mb-4 w-96 ">Why Choose Drivigo?</h3>
+                  <h3 className="text-3xl text-black font-display font-bold mb-4 lg:w-96 ">Why Choose Drivigo?</h3>
                   <motion.ul 
                     variants={staggerContainer}
                     initial="hidden"
@@ -252,12 +254,12 @@ function About() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
         variants={fadeIn}
-        className="mx-24 py-20 bg-primary-500 rounded-3xl mb-16"
+        className="lg:mx-24 mx-4 py-20 bg-primary-500 rounded-3xl mb-16"
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2 
             variants={fadeIn}
-            className="text-3xl lg:text-4xl font-display font-bold text-black mb-6"
+            className="text-3xl lg:text-4xl font-display font-bold text-white mb-6"
           >
             Ready to Start Your Driving Journey?
           </motion.h2>
@@ -268,7 +270,7 @@ function About() {
             whileTap={{ scale: 0.95 }}
           >
             <Link 
-              to="/book-lesson" 
+              to={user ? "/dashboard" : "/signin"} 
               className="btn-secondary text-lg px-8 py-4 inline-block"
             >
               Book Your First Lesson

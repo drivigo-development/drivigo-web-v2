@@ -8,10 +8,11 @@ import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 // Define libraries array outside component to prevent recreation on each render
 const libraries = ["places"];
 
-export default function Instructor_Details({ instructorId }) {
+export default function Instructor_Details({ instructorId, onStatusChange }) {
   const [aadharFile, setAadharFile] = useState(null);
   const [licenseFile, setLicenseFile] = useState(null);
   const [vehicleFile, setVehicleFile] = useState(null);
+  const [status, setStatus] = useState('pending');
 
   const [aadharPreview, setAadharPreview] = useState("");
   const [licensePreview, setLicensePreview] = useState("");
@@ -83,6 +84,12 @@ export default function Instructor_Details({ instructorId }) {
         setAadharPreview(data.aadhar_img || "");
         setLicensePreview(data.license_img || "");
         setVehiclePreview(data.vehicle_img || "");
+        setStatus(data.status || "pending");
+        
+        // Notify parent component about status change
+        if (onStatusChange && typeof onStatusChange === 'function') {
+          onStatusChange(data.status || "pending");
+        }
         
         // Set location coordinates if available in the database
         if (data.latitude && data.longitude) {
@@ -196,6 +203,7 @@ export default function Instructor_Details({ instructorId }) {
             d_school_location: location,
             latitude: locationCoords.lat,
             longitude: locationCoords.lng,
+            status: status,
           },
           { onConflict: 'instructor_id', returning: true }
         );

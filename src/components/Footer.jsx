@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Facebook, Instagram } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -61,24 +61,26 @@ function Footer() {
               Drivi
               <span className="font-display  text-gradient">go</span>
             </Link>
-            <p className="text-secondary-300 mb-4 max-w-md text-sm sm:text-base">
-              Learn driving with verified instructors. Book secure driving
-              lessons online and start your journey to becoming a confident
-              driver.
+            <p className="text-secondary-300 mt-2 mb-4 max-w-md text-lg lg:text-lg">
+              Drivigo se Seekho!
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 ">
               <a
+                target="_blank"
                 href="https://www.instagram.com/drivigo.in/"
                 className="text-secondary-400 hover:text-white transition-colors"
               >
                 <Instagram />
               </a>
               <a
+                target="_blank"
                 href="https://www.facebook.com/profile.php?id=61573829202315"
                 className="text-secondary-400 hover:text-white transition-colors"
               >
                 <Facebook />
               </a>
+              <a target="_blank" href="https://www.youtube.com/@drivigo-in" className="text-secondary-400 hover:text-white transition-colors"><Youtube /></a>
+            <a target="_blank" href="https://www.linkedin.com/company/drivigo-in" className="text-secondary-400 hover:text-white transition-colors"><Linkedin /></a>
             </div>
           </div>
 
@@ -155,14 +157,6 @@ function Footer() {
                     Terms of Service
                   </Link>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-secondary-300 text-sm sm:text-base hover:text-white transition-colors"
-                  >
-                    Safety Guidelines
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
@@ -211,30 +205,11 @@ function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-secondary-800 mt-6 sm:mt-8 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center">
+        <div className="border-t border-secondary-800 mt-6 sm:mt-8 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-center items-center">
           <p className="text-secondary-400 text-xs sm:text-sm text-center sm:text-left">
             &copy; {currentYear} Drivigo. All rights reserved.
           </p>
-          <div className="flex space-x-4 sm:space-x-6 mt-4 sm:mt-0">
-            <a
-              href="#"
-              className="text-secondary-400 hover:text-white text-xs sm:text-sm transition-colors"
-            >
-              Privacy
-            </a>
-            <a
-              href="#"
-              className="text-secondary-400 hover:text-white text-xs sm:text-sm transition-colors"
-            >
-              Terms
-            </a>
-            <a
-              href="#"
-              className="text-secondary-400 hover:text-white text-xs sm:text-sm transition-colors"
-            >
-              Cookies
-            </a>
-          </div>
+
         </div>
       </div>
     </footer>

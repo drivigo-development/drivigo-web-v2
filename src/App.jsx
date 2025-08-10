@@ -20,6 +20,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
+import Admin from './pages/Admin';
 
 
 
@@ -70,6 +71,7 @@ function App() {
             <Route path="/loader" element={<Loader />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/booking" element={<BookingPage />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
         <Footer/>

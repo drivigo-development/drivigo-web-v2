@@ -115,7 +115,7 @@ console.log(role);
             Join Drivigo and start your driving journey
           </p>
           <DotLottieReact
-            src="https://lottie.host/92c6e218-c7ec-405b-964e-9274e6c5d2e7/owiUUVx8Qc.lottie"
+            src="https://lottie.host/b24dd53e-dbe6-431f-95eb-a9d4497ca37d/4w7WquJZ8y.lottie"
             loop
             autoplay
             className="h-96 hidden lg:block"

@@ -3,13 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import Loader from '../components/Loader';
-import { Calendar, Edit, Save, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Edit, Save, Clock, CheckCircle, AlertCircle, Timer, ShieldAlert } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
+import Instructor_Details from '../components/Instructor_Details';
 
 function Dashboard() {
   const { user, signOut } = useAuth();
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
+  const [instructorStatus, setInstructorStatus] = useState('pending');
   const [lessons, setLessons] = useState([]);
   const [editingAvailability, setEditingAvailability] = useState(false);
   const [availabilityData, setAvailabilityData] = useState([]);
@@ -1163,7 +1165,34 @@ function Dashboard() {
   };
 
   // Render the instructor dashboard with pagination for past and upcoming sessions
+  // Render pending verification message for instructors with pending status
+  const renderPendingVerificationMessage = () => {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-lg w-full text-center">
+          <div className="flex justify-center mb-4">
+            <ShieldAlert className="h-16 w-16 text-primary-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Verification Pending</h2>
+          <div className="bg-primary-100 p-4 rounded-md mb-6">
+            <p className="text-gray-700 mb-2">Your profile and documents are currently under review.</p>
+            <p className="text-gray-700">Once verified, you'll have full access to the instructor dashboard.</p>
+          </div>
+          <div className="flex items-center justify-center text-sm text-gray-500">
+            <Timer className="h-5 w-5 mr-2" />
+            <span>Please check back later</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderInstructorDashboard = () => {
+    // If instructor status is pending, show the pending verification message
+    if (instructorStatus === 'pending') {
+      return renderPendingVerificationMessage();
+    }
+    
     // Create today's date for filtering sessions
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
@@ -1445,6 +1474,16 @@ function Dashboard() {
 
       {/* Dashboard Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Hidden Instructor_Details component to get status for instructors */}
+        {userRole === 'instructor' && (
+          <div className="hidden">
+            <Instructor_Details 
+              instructorId={user?.id} 
+              onStatusChange={setInstructorStatus} 
+            />
+          </div>
+        )}
+        
         {userRole === 'instructor' ? renderInstructorDashboard() : renderLearnerDashboard()}
       </div>
     </div>

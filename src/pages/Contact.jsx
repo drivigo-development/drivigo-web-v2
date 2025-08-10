@@ -183,24 +183,28 @@ function Contact() {
 
   const faqs = [
     {
-      question: "How do I book a driving lesson?",
-      answer: "Simply sign up for an account, browse available instructors, and book a lesson that fits your schedule. Our intuitive booking system makes it easy to find the perfect time slot for your driving lessons."
+      question: "Can I choose my instructor?",
+      answer: "Yes! You can view instructor profiles, ratings, and reviews before booking to select the one that best suits your needs."
     },
     {
-      question: "Are all instructors verified?",
-      answer: "Yes, all our instructors go through a thorough verification process including background checks, certification verification, and regular performance reviews to ensure the highest quality of instruction."
+      question: "Do I need to have my own car for lessons?",
+      answer: "Not necessarily. Many instructors provide their own training vehicles equipped with dual controls for safety."
     },
     {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards, debit cards, and digital wallets for secure payment processing. All transactions are encrypted and protected with industry-standard security protocols."
+      question: "Are lessons available on weekends or evenings?",
+      answer: "Yes, many instructors offer flexible timings, including weekends and evenings, to match your schedule."
     },
     {
-      question: "Can I reschedule my driving lesson?",
-      answer: "Yes, you can reschedule your driving lesson up to 24 hours before the scheduled time without any penalty. Simply log into your account and use our easy rescheduling tool."
+      question: "Do you offer packages or discounts for multiple lessons?",
+      answer: "Absolutely. We offer discounted packages at 30% off so you can save while learning at your own pace."
     },
     {
-      question: "Do you offer specialized driving courses?",
-      answer: "Yes, we offer specialized courses for defensive driving, highway driving, parallel parking, and other specific skills. Contact us for more information about our specialized training options."
+      question: "Is there a way to track my learning progress?",
+      answer: "Yes. Your account dashboard shows completed lessons, skills learned, and recommendations for your next steps."
+    },
+    {
+      question: "How soon can I start after signing up?",
+      answer: "In most cases, you can start within 24–48 hours depending on instructor availability in your area."
     }
   ];
 
@@ -322,6 +326,7 @@ function Contact() {
                   >
                     <option value="Learner">Learner</option>
                     <option value="Instructor">Instructor</option>
+                    <option value="Others">Others</option>
                   </select>
                 </motion.div>
 
@@ -483,29 +488,29 @@ function Contact() {
 
           <motion.div 
             variants={faqContainer}
-            className="space-y-6"
+            className="space-y-8 max-w-3xl mx-auto"
           >
             {faqs.map((faq, index) => (
               <motion.div 
                 key={index}
                 variants={fadeIn}
-                className="overflow-hidden rounded-lg border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-800 shadow-sm"
+                className={`overflow-hidden rounded-xl border ${expandedFaq === index ? 'border-primary-300 dark:border-primary-700' : 'border-secondary-200 dark:border-secondary-700'} bg-white dark:bg-secondary-800 shadow-lg transition-all duration-300 hover:shadow-xl`}
               >
                 <motion.button
                   onClick={() => toggleFaq(index)}
-                  className="w-full flex justify-between items-center p-5 text-left focus:outline-none"
-                  whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+                  className={`w-full flex justify-between items-center p-6 text-left focus:outline-none ${expandedFaq === index ? 'bg-primary-50 dark:bg-primary-900/20' : ''}`}
+                  whileHover={{ backgroundColor: expandedFaq === index ? "rgba(79, 70, 229, 0.1)" : "rgba(0,0,0,0.02)" }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-secondary-100">
+                  <h3 className={`text-lg font-semibold ${expandedFaq === index ? 'text-primary-700 dark:text-primary-300' : 'text-secondary-900 dark:text-secondary-100'}`}>
                     {faq.question}
                   </h3>
                   <motion.div
                     animate={{ rotate: expandedFaq === index ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
-                    className="text-primary-600 dark:text-primary-400"
+                    className={`flex items-center justify-center w-8 h-8 rounded-full ${expandedFaq === index ? 'bg-primary-100 text-primary-600 dark:bg-primary-800 dark:text-primary-300' : 'bg-secondary-100 text-secondary-500 dark:bg-secondary-700 dark:text-secondary-300'}`}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                   </motion.div>
@@ -518,16 +523,11 @@ function Contact() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
+                      className="border-t border-primary-100 dark:border-primary-800/30"
                     >
-                      <motion.div 
-                        initial={{ y: 10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                        className="p-5 pt-0 text-secondary-600 dark:text-secondary-400 border-t border-secondary-100 dark:border-secondary-700"
-                      >
-                        {faq.answer}
-                      </motion.div>
+                      <div className="px-6 py-5 bg-gradient-to-br from-white to-primary-50 dark:from-secondary-800 dark:to-primary-900/10">
+                        <p className="text-secondary-700 dark:text-secondary-200 leading-relaxed">{faq.answer}</p>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

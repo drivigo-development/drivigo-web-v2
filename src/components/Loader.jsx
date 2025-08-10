@@ -13,7 +13,6 @@ const Loader = () => {
       .sky {
         height: 100vh;
         width: 100%;
-        background-color: #ffedd5;
         padding-bottom: 400px;
       }
 
@@ -87,7 +86,7 @@ const Loader = () => {
   }, []);
 
   return (
-    <div className="sky">
+    <div className="sky bg-white">
       <div className="car">
         <img src="https://i.imgur.com/n947rWL.png" alt="Yellow Car" />
       </div>
