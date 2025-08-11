@@ -1162,9 +1162,7 @@ return (
                     <h3 className="text-xl font-display font-semibold text-secondary-900 mb-2">
                       {instructor.name || "Instructor"}
                     </h3>
-                    <p className="text-secondary-600 mb-2">
-                      {instructor.school_name || "Drivigo Driving School"}
-                    </p>
+
                     <div className="flex items-center justify-center space-x-2 text-sm text-secondary-500">
                       <svg
                         className="w-4 h-4"
@@ -1293,9 +1291,6 @@ return (
                   <h3 className="text-2xl font-display font-semibold text-secondary-900 mb-1">
                     {selectedInstructor.name}
                   </h3>
-                  <p className="text-secondary-600 mb-1">
-                    {selectedInstructor.school_name || "Drivigo Driving School"}
-                  </p>
                   <p className="text-secondary-600">
                     {selectedInstructor.vehicle_model || selectedInstructor.car_model || "Standard Training Car"}
                   </p>
