@@ -60,7 +60,7 @@ const Admin = () => {
     
     if (isLocked) return;
 
-    if (password === 'admin123') {
+    if (password === 'admin10295634') {
       // Set session storage with 2-hour expiry
       const expiry = Date.now() + (2 * 60 * 60 * 1000); // 2 hours
       sessionStorage.setItem('adminAuth', JSON.stringify({ expiry }));
