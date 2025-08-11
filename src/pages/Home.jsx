@@ -123,7 +123,7 @@ function Home() {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Link
-                    to={user ? "/dashboard" : "/signin"}
+                    to={user ? "/dashboard" : "/signup"}
                     className="btn-primary text-lg px-8 py-4 inline-block"
                   >
                     Book Your First Lesson
@@ -354,7 +354,7 @@ function Home() {
             whileTap={{ scale: 0.95 }}
           >
             <Link 
-              to={user ? "/dashboard" : "/signin"}
+              to={user ? "/dashboard" : "/signup"}
               className="btn-secondary text-lg px-8 py-4 inline-block"
             >
               Book Your First Lesson
