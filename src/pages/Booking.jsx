@@ -48,11 +48,13 @@ function BookingPage() {
   const [isLocating, setIsLocating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [amount, setAmount] = useState(0);
+  const [discountedAmount, setDiscountedAmount] = useState(0);
+  const [showCouponInput, setShowCouponInput] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [showInstructorDetails, setShowInstructorDetails] = useState(false);
-  
-  // Payment details
-  const [amount, setAmount] = useState(0);
   const [currency, setCurrency] = useState("INR");
 
   // Load Google Maps API
@@ -67,11 +69,36 @@ function BookingPage() {
   // Calculate amount based on session plan
   useEffect(() => {
     if (bookingDetails.sessionPlan === "7-day") {
-      setAmount(5000);
+      setAmount(6999);
     } else if (bookingDetails.sessionPlan === "14-day") {
-      setAmount(7000);
+      setAmount(6999);
+    }
+    
+    // Reset coupon when plan changes
+    if (couponApplied) {
+      applyCouponCode();
+    } else {
+      setDiscountedAmount(0);
     }
   }, [bookingDetails.sessionPlan]);
+  
+  // Handle coupon code application
+  const applyCouponCode = () => {
+    if (couponCode.trim().toUpperCase() === "DRIVEPL30") {
+      // Apply 30% discount
+      const discount = amount * 0.3;
+      setDiscountedAmount(4899);
+      setCouponApplied(true);
+      toast.success("Coupon applied successfully! 30% discount");
+    } else if (couponCode.trim() !== "") {
+      toast.error("Invalid coupon code");
+      setCouponApplied(false);
+      setDiscountedAmount(0);
+    } else {
+      setCouponApplied(false);
+      setDiscountedAmount(0);
+    }
+  };
   
   // Check login status
   useEffect(() => {
@@ -229,6 +256,8 @@ function BookingPage() {
         return;
       }
       
+      // Debug function removed - no longer needed
+      
       // Fetch all instructors with their location data
       const { data: allInstructors, error: instructorError } = await supabase
         .from('users')
@@ -284,11 +313,11 @@ function BookingPage() {
       
       // Filter instructors within 5km radius
       const nearbyInstructors = instructorsWithDistance.filter(instructor => 
-        instructor.distance !== null && instructor.distance <= 5
+        instructor.distance !== null && instructor.distance <= 10
       );
-      
+      console.log("nearbyInstructors", nearbyInstructors)
       if (nearbyInstructors.length === 0) {
-        toast.error("No instructors found within 5km of your location");
+        toast.error("No instructors found within 10km of your location");
         setInstructors([]);
         setIsLoading(false);
         setIsSearching(false);
@@ -312,11 +341,16 @@ function BookingPage() {
           
           // Get instructor's blocked slots
           const startDate = new Date(bookingDetails.startDate);
+          const formattedStartDate = startDate.toISOString().split('T')[0];
+          
+          // Modified query to correctly filter blocked slots
+          // We need to check if the selected date falls between start_date and end_date
           const { data: blockedSlots, error: blockedError } = await supabase
             .from('blocked_slots')
             .select('*')
             .eq('instructor_id', instructor.instructor_id)
-            .gte('start_date', startDate.toISOString().split('T')[0]);
+            .lte('start_date', formattedStartDate) // Start date is before or equal to selected date
+            .gte('end_date', formattedStartDate);   // End date is after or equal to selected date
             
           if (blockedError) {
             console.error("Error fetching blocked slots:", blockedError);
@@ -324,6 +358,7 @@ function BookingPage() {
           }
           
           // Process availability and blocked slots to determine available time slots
+          
           const { availableSlots, blockedSlots: instructorBlockedSlots } = processAvailability(availability, blockedSlots, startDate);
           
           return {
@@ -359,32 +394,95 @@ function BookingPage() {
   
   // Helper function to process availability and blocked slots
   const processAvailability = (availability, blockedSlots, startDate) => {
-    if (!availability || availability.length === 0) return { availableSlots: [], blockedSlots: [] };
+    if (!availability || availability.length === 0) {
+      return { availableSlots: [], blockedSlots: [] };
+    }
     
     // Map day of week (0 = Sunday, 1 = Monday, etc.)
     const dayOfWeek = startDate.getDay();
     
-    // Find availability for the selected day
-    const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
-    if (!dayAvailability || !dayAvailability.time_slots) return { availableSlots: [], blockedSlots: [] };
+    // Get all available time slots from all days (not just the selected day)
+    // This ensures we show instructors even if they're not available on the exact start date
+    // but are available on other days
+    let allTimeSlots = [];
     
-    // Get all time slots for that day
-    const allTimeSlots = dayAvailability.time_slots;
+    // First check if there's availability for the selected day
+    const dayAvailability = availability.find(slot => slot.day_of_week === dayOfWeek);
+    
+    if (dayAvailability && dayAvailability.time_slots && dayAvailability.time_slots.length > 0) {
+      allTimeSlots = [...dayAvailability.time_slots];
+    } else {
+      // If no availability on the selected day, check all days
+      availability.forEach(slot => {
+        if (slot.time_slots && slot.time_slots.length > 0) {
+          allTimeSlots = [...allTimeSlots, ...slot.time_slots];
+        }
+      });
+    }
+    
+    // Remove duplicates
+    allTimeSlots = [...new Set(allTimeSlots)];
     
     // Filter out blocked slots for the selected date
     const blockedForDate = blockedSlots.filter(block => {
       const blockStart = new Date(block.start_date);
       const blockEnd = new Date(block.end_date);
-      return startDate >= blockStart && startDate <= blockEnd;
+      const isBlocked = startDate >= blockStart && startDate <= blockEnd;
+      return isBlocked;
     });
     
     // Get all blocked time slots for that date
-    const blockedTimeSlots = blockedForDate.flatMap(block => block.time_slots || []);
+    // Handle both array and object formats for JSONB data
+    const blockedTimeSlots = blockedForDate.flatMap(block => {
+      // Handle different possible formats of time_slots from JSONB
+      let slots = [];
+      
+      if (block.time_slots) {
+        if (Array.isArray(block.time_slots)) {
+          slots = block.time_slots;
+        } else if (typeof block.time_slots === 'object') {
+          // If it's an object, convert to array of values
+          slots = Object.values(block.time_slots);
+        } else if (typeof block.time_slots === 'string') {
+          // If it's a string (single slot), make it an array
+          slots = [block.time_slots];
+        }
+      }
+      
+      return slots;
+    });
+    
+    // Normalize time slots for comparison
+    // This ensures we're comparing strings to strings or arrays to arrays
+    const normalizedBlockedSlots = blockedTimeSlots.map(slot => {
+      // If the slot is an array with one element, extract the element
+      if (Array.isArray(slot) && slot.length === 1) {
+        return slot[0];
+      }
+      return slot;
+    });
     
     // Return both available and blocked slots
+    const availableSlots = allTimeSlots.filter(slot => {
+      // Check if this slot is blocked
+      const isBlocked = normalizedBlockedSlots.some(blockedSlot => {
+        // Handle string comparison
+        if (typeof blockedSlot === 'string' && typeof slot === 'string') {
+          return blockedSlot === slot;
+        }
+        // Handle array comparison
+        if (Array.isArray(blockedSlot) && Array.isArray(slot)) {
+          return JSON.stringify(blockedSlot) === JSON.stringify(slot);
+        }
+        return false;
+      });
+      
+      return !isBlocked;
+    });
+    
     return {
-      availableSlots: allTimeSlots.filter(slot => !blockedTimeSlots.includes(slot)),
-      blockedSlots: blockedTimeSlots
+      availableSlots: availableSlots,
+      blockedSlots: normalizedBlockedSlots
     };
   };
 
@@ -409,9 +507,12 @@ function BookingPage() {
       }));
     } else {
       // Replace any existing selection with just this slot
+      // Ensure we're storing it as a string for consistency
+      const slotString = typeof slot === 'string' ? slot : String(slot);
+      
       setBookingDetails(prev => ({
         ...prev,
-        selectedTimeSlots: [slot]
+        selectedTimeSlots: [slotString]
       }));
       
       // Show feedback to the user
@@ -543,15 +644,18 @@ function BookingPage() {
       }
       
       // Calculate amount in paise (smallest currency unit)
-      const amount = bookingDetails.sessionPlan === "7-day" ? 5000 : 7000;
-      const paiseAmount = amount * 100;
+      const finalAmount = couponApplied ? discountedAmount : amount;
+      const paiseAmount = finalAmount * 100;
       const currency = "INR";
+      
+      // Add coupon information to notes if applied
+      const couponInfo = couponApplied ? { coupon_code: couponCode, discount: "30%" } : {};
       
       // Create order via backend API
       const { data } = await axios.post(
         `${apiUrl}/create-order`,
         {
-          amount,
+          amount: finalAmount,
           currency,
           receipt: `booking-${Date.now()}`,
           notes: {
@@ -562,7 +666,12 @@ function BookingPage() {
             end_date: bookingDetails.endDate,
             time_slots: bookingDetails.selectedTimeSlots.join(','),
             pickup_location: bookingDetails.address,
-            pickup_coordinates: `${bookingDetails.location.lat},${bookingDetails.location.lng}`
+            pickup_coordinates: `${bookingDetails.location.lat},${bookingDetails.location.lng}`,
+            ...(couponApplied && { 
+              coupon_code: couponCode,
+              original_amount: amount,
+              discount_percentage: "30%"
+            })
           }
         }
       );
@@ -703,21 +812,26 @@ function BookingPage() {
                 }
                 
                 // Step 2: Insert into blocked_slots table
-                console.log('Creating blocked slots for instructor');
-                
                 // Insert into blocked_slots table with proper schema
-                const { error: blockError } = await supabase
+                
+                // Make sure time_slots is properly formatted as an array
+                const timeSlots = Array.isArray(bookingDetails.selectedTimeSlots) 
+                  ? bookingDetails.selectedTimeSlots 
+                  : [bookingDetails.selectedTimeSlots];
+                
+                const blockData = {
+                  instructor_id: selectedInstructor.instructor_id,
+                  start_date: bookingDetails.startDate,
+                  end_date: bookingDetails.endDate,
+                  time_slots: timeSlots,
+                  booking_id: bookingData.booking_id
+                };
+                
+                const { data: blockResult, error: blockError } = await supabase
                   .from('blocked_slots')
-                  .insert([
-                    {
-                      instructor_id: selectedInstructor.instructor_id,
-                      start_date: bookingDetails.startDate,
-                      end_date: bookingDetails.endDate,
-                      time_slots: bookingDetails.selectedTimeSlots, // This will be converted to JSONB
-                      booking_id: bookingData.booking_id
-                      // block_id will use DEFAULT uuid_generate_v4()
-                    }
-                  ]);
+                  .insert([blockData])
+                  .select();
+                
                   
                 if (blockError) {
                   console.error('Blocking slots error:', blockError);
@@ -945,7 +1059,6 @@ return (
                           7 Days
                         </div>
                         <div className="text-sm">1 hour per day</div>
-                        <div className="text-lg font-semibold mt-2">₹5,000</div>
                       </div>
                     </div>
                   </label>
@@ -971,12 +1084,13 @@ return (
                           14 Days
                         </div>
                         <div className="text-sm">30 minutes per day</div>
-                        <div className="text-lg font-semibold mt-2">₹7,000</div>
                       </div>
                     </div>
                   </label>
                 </div>
               </div>
+
+
 
               {/* Find Instructors Button */}
               <div className="text-center">
@@ -1263,13 +1377,25 @@ return (
                 )}
                 
                 {/* Payment Button */}
-                <div className="mt-8 border-t border-secondary-100 pt-6">
-                  <div className="flex justify-between items-center mb-4">
+                <div className="mt-4 ">
+                  <div className="flex justify-between items-center ">
                     <div>
                       <p className="text-lg font-semibold">Total Amount</p>
-                      <p className="text-2xl font-display font-bold text-primary-600">
-                        {bookingDetails.sessionPlan === "7-day" ? "₹5,000" : "₹7,000"}
-                      </p>
+                      {couponApplied ? (
+                        <div>
+                          <p className="text-2xl font-display font-bold text-primary-600">
+                            ₹{discountedAmount.toLocaleString()}
+                          </p>
+                          <div className="flex items-center mt-1">
+                            <p className="text-sm text-secondary-500 line-through mr-2">₹{amount.toLocaleString()}</p>
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">30% OFF</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-2xl font-display font-bold text-primary-600">
+                          ₹{amount.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                     <button
                       onClick={handlePayment}
@@ -1291,7 +1417,66 @@ return (
                       )}
                     </button>
                   </div>
-                  <p className="text-sm text-secondary-500">
+                  
+                  
+                  {/* Coupon Code Section */}
+                  <div className=" mt-2">
+                    <div className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id="hasCoupon"
+                        checked={showCouponInput}
+                        onChange={() => setShowCouponInput(!showCouponInput)}
+                        className="w-4 h-4 text-primary-600 border-secondary-300 rounded focus:ring-primary-500"
+                      />
+                      <label htmlFor="hasCoupon" className="ml-2 text-base font-medium text-secondary-700 cursor-pointer">
+                        I have a coupon code
+                      </label>
+                    </div>
+                    
+                    {showCouponInput && (
+                      <div className="mt-2 mb-4">
+                        <div className="flex">
+                          <input
+                            type="text"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            placeholder="Enter coupon code"
+                            className="flex-grow px-4 py-2 border border-secondary-300 rounded-l-md focus:ring-primary-500 focus:border-primary-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={applyCouponCode}
+                            disabled={couponApplied}
+                            className={`px-4 py-2 font-medium text-white rounded-r-md ${couponApplied ? 'bg-green-500' : 'bg-primary-600 hover:bg-primary-700'}`}
+                          >
+                            {couponApplied ? 'Applied' : 'Apply'}
+                          </button>
+                        </div>
+                        {couponApplied && (
+                          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+                            <div className="flex items-center">
+                              <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                              <span className="text-green-700 font-medium">30% discount applied!</span>
+                            </div>
+                            <div className="mt-2 flex justify-between items-center">
+                              <div>
+                                <div className="text-secondary-600">Original price:</div>
+                                <div className="text-secondary-600">Discount:</div>
+                                <div className="font-semibold text-secondary-900">Final price:</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-secondary-600">₹{amount.toLocaleString()}</div>
+                                <div className="text-green-600">-₹{(amount - discountedAmount).toLocaleString()}</div>
+                                <div className="font-semibold text-secondary-900">₹{discountedAmount.toLocaleString()}</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm text-secondary-500 mb-4">
                     By proceeding, you agree to our terms and conditions. Your booking will be confirmed after successful payment.
                   </p>
                 </div>

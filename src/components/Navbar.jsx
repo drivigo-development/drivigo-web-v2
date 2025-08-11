@@ -139,7 +139,7 @@ const Navbar = () => {
                   )}
                 </Link>
                 <button onClick={handleLogout} className="btn-danger text-sm">
-                  <LogOut size={20} />
+                  Logout <LogOut className="ml-2" size={20} />
                 </button>
               </>
             ) : (
@@ -292,9 +292,9 @@ const Navbar = () => {
                       handleLogout();
                       closeMobileMenu();
                     }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+                    className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
                   >
-                    <LogOut size={20} />
+                    Logout <LogOut className="ml-2" size={20} />
                   </button>
                 </>
               ) : (

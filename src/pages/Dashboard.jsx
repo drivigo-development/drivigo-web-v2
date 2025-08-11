@@ -33,10 +33,63 @@ function Dashboard() {
   const [currentUpcomingPage, setCurrentUpcomingPage] = useState(1);
   const [currentInstructorPastPage, setCurrentInstructorPastPage] = useState(1);
   const [currentInstructorUpcomingPage, setCurrentInstructorUpcomingPage] = useState(1);
-  const tableItemsPerPage = 5;
+  const [totalLearners, setTotalLearners] = useState(0);
+  const [totalPayout, setTotalPayout] = useState(0);
+  const tableItemsPerPage = 7;
   const cardItemsPerPage = 2;
 
   // console.log(user)
+
+  // Fetch instructor statistics (total learners and total payout)
+  const fetchInstructorStats = async (role = userRole) => {
+    // Accept role as a parameter or use userRole state
+    // This allows the function to be called with the current role value
+    // even if the userRole state hasn't updated yet
+    if (!user || (role !== 'instructor' && userRole !== 'instructor')) return;
+    
+    try {
+      // Query bookings directly using the instructor's user ID
+      // This avoids the need to first fetch from instructor_table
+      const { data: bookingsData, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('booking_id, learner_id, amount')
+        .eq('instructor_id', user.id);
+        
+      if (bookingsError) throw bookingsError;
+      
+      if (bookingsData && bookingsData.length > 0) {
+        // Count unique learners by filtering out null learner_ids and creating a Set
+        const validLearnerIds = bookingsData
+          .filter(booking => booking.learner_id)
+          .map(booking => booking.learner_id);
+        
+        const uniqueLearners = new Set(validLearnerIds);
+        setTotalLearners(uniqueLearners.size);
+        
+        // Sum total payout from the amount field
+        // Convert string amounts to numbers and handle null values
+        const totalAmount = bookingsData.reduce((sum, booking) => {
+          const bookingAmount = booking.amount ? parseFloat(booking.amount) : 0;
+          return sum + bookingAmount;
+        }, 0);
+        
+        setTotalPayout(totalAmount);
+        
+        console.log('Instructor stats:', {
+          bookings: bookingsData.length,
+          uniqueLearners: uniqueLearners.size,
+          totalAmount
+        });
+      } else {
+        // Set defaults if no bookings found
+        setTotalLearners(0);
+        setTotalPayout(0);
+      }
+    } catch (error) {
+      console.error('Error fetching instructor stats:', error);
+      toast.error('Failed to load teaching statistics');
+    }
+  };
 
   // Define fetchUpcomingSessions before it's used
   const fetchUpcomingSessions = async () => {
@@ -357,12 +410,15 @@ function Dashboard() {
           
           if (userError) throw userError;
           
+          // Set the role first before calling any functions that depend on it
           setUserRole(userData.role);
           
-          // If user is an instructor, fetch their availability and sessions
+          // If user is an instructor, fetch their availability, sessions, and stats
           if (userData.role === 'instructor') {
             await fetchInstructorAvailability();
             await fetchInstructorSessions();
+            // Call fetchInstructorStats with the current role value
+            fetchInstructorStats(userData.role);
           } else if (userData.role === 'learner') {
             // If user is a learner, fetch upcoming sessions
             await fetchUpcomingSessions();
@@ -1432,18 +1488,14 @@ function Dashboard() {
         <h3 className="text-xl font-bold text-gray-800 mb-6">
           Teaching Statistics
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-blue-50 p-4 rounded-lg text-center">
-            {/* <div className="text-3xl font-bold text-blue-600 mb-2">{lessons.length}</div> */}
-            <div className="text-gray-600">Upcoming Classes</div>
+            <div className="text-3xl font-bold text-blue-600 mb-2">{totalLearners || 0}</div>
+            <div className="text-gray-600">Total Learners</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg text-center">
-            {/* <div className="text-3xl font-bold text-green-600 mb-2">{achievements.length}</div> */}
-            <div className="text-gray-600">Student Achievements</div>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg text-center">
-            <div className="text-3xl font-bold text-purple-600 mb-2">4.9</div>
-            <div className="text-gray-600">Average Rating</div>
+            <div className="text-3xl font-bold text-green-600 mb-2">₹{totalPayout ? totalPayout.toLocaleString('en-IN') : '0'}</div>
+            <div className="text-gray-600">Total Payout</div>
           </div>
         </div>
       </div>
