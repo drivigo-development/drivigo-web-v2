@@ -1,26 +1,26 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 
 import './App.css'
-import Signup from './pages/Signup';
-import Signin from './pages/Signin';
 import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
-import AuthCallback from './pages/AuthCallback';
-
-// Page components
-import Home from './pages/Home';
-import Profile from './pages/Profile';
 import Loader from './components/Loader';
 import Footer from './components/Footer';
-import Dashboard from './pages/Dashboard';
-import BookingPage from './pages/Booking';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsAndConditions from './pages/TermsAndConditions';
-import Admin from './pages/Admin';
+
+// Lazy loaded components
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const TermsAndConditions = lazy(() => import('./pages/TermsAndConditions'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Signin = lazy(() => import('./pages/Signin'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const BookingPage = lazy(() => import('./pages/Booking'));
+const Admin = lazy(() => import('./pages/Admin'));
 
 
 
@@ -56,23 +56,25 @@ function App() {
           },
         }} />
         <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-            <Route path="/404" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/404" replace />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/signin" element={<Signin />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/loader" element={<Loader />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/booking" element={<BookingPage />} />
-            <Route path="/admin" element={<Admin />} />
-          </Routes>
+          <Suspense fallback={<div className="flex justify-center items-center h-screen"><Loader /></div>}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/404" element={<NotFound />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/signin" element={<Signin />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/loader" element={<Loader />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/booking" element={<BookingPage />} />
+              <Route path="/admin" element={<Admin />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer/>
       </BrowserRouter>
