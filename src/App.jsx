@@ -7,7 +7,6 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import Loader from './components/Loader';
 import Footer from './components/Footer';
-import NotificationHandler from './components/NotificationHandler';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 // Lazy loaded components
@@ -40,7 +39,6 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Navbar/>
-        <NotificationHandler />
         <PWAInstallPrompt />
         <Toaster position="top-center" toastOptions={{
           duration: 3000,
