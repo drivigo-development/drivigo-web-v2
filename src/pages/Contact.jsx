@@ -390,95 +390,61 @@ function Contact() {
             </motion.div>
 
             {/* Contact Information */}
-            <motion.div 
-              variants={staggerContainer}
-              className="space-y-8"
-            >
-              <motion.div variants={fadeIn}>
-                <motion.h2 
-                  variants={fadeIn}
-                  className="text-2xl font-display font-bold text-secondary-900 dark:text-secondary-100 mb-6"
-                >
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-display font-bold text-secondary-900 dark:text-secondary-100 mb-6">
                   Contact Information
-                </motion.h2>
-                <motion.p 
-                  variants={fadeIn}
-                  className="text-secondary-600 dark:text-secondary-400 mb-8"
-                >
+                </h2>
+                <p className="text-secondary-600 dark:text-secondary-400 mb-8">
                   Reach out to us through any of these channels. We're here to help!
-                </motion.p>
-              </motion.div>
+                </p>
+              </div>
 
-              <motion.div 
-                variants={staggerContainer}
-                className="space-y-6"
-              >
+              <div className="space-y-6">
                 {contactInfo.map((info, index) => (
-                  <motion.div 
+                  <div 
                     key={index} 
-                    variants={slideIn}
                     className="flex items-start space-x-4"
                   >
-                    <motion.div 
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      className="h-10 w-10 flex items-center justify-center bg-primary-100 dark:bg-primary-800 rounded-full"
-                    >
+                    <div className="h-10 w-10 flex items-center justify-center bg-primary-100 dark:bg-primary-800 rounded-full">
                       <img src={info.icon} alt={info.title} className="h-6 w-6" />
-                    </motion.div>
-                    <div>
-                      <motion.h3 
-                        variants={fadeIn}
-                        className="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-1"
-                      >
-                        {info.title}
-                      </motion.h3>
-                      <motion.p 
-                        variants={fadeIn}
-                        className="text-secondary-900 dark:text-secondary-400 font-medium mb-1"
-                      >
-                        {info.details}
-                      </motion.p>
-                      <motion.p 
-                        variants={fadeIn}
-                        className="text-secondary-600 text-sm"
-                      >
-                        {info.description}
-                      </motion.p>
                     </div>
-                  </motion.div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-1">
+                        {info.title}
+                      </h3>
+                      <p className="text-secondary-900 dark:text-secondary-400 font-medium mb-1">
+                        {info.details}
+                      </p>
+                      <p className="text-secondary-600 text-sm">
+                        {info.description}
+                      </p>
+                    </div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
 
               {/* Business Hours */}
-              <motion.div 
-                variants={scaleIn}
-                className="card"
-              >
-                <motion.h3 
-                  variants={fadeIn}
-                  className="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-4"
-                >
+              <div className="card">
+                <h3 className="text-lg font-semibold text-secondary-900 dark:text-secondary-100 mb-4">
                   Business Hours
-                </motion.h3>
-                <motion.div 
-                  variants={staggerContainer}
-                  className="space-y-2 text-secondary-600 dark:text-secondary-400"
-                >
-                  <motion.div variants={fadeIn} className="flex justify-between">
+                </h3>
+                <div className="space-y-2 text-secondary-600 dark:text-secondary-400">
+                  <div className="flex justify-between">
                     <span>Monday - Friday</span>
                     <span>9:00 AM - 6:00 PM</span>
-                  </motion.div>
-                  <motion.div variants={fadeIn} className="flex justify-between">
+                  </div>
+                  <div className="flex justify-between">
                     <span>Saturday</span>
                     <span>10:00 AM - 4:00 PM</span>
-                  </motion.div>
-                  <motion.div variants={fadeIn} className="flex justify-between">
+                  </div>
+                  <div className="flex justify-between">
                     <span>Sunday</span>
                     <span>Closed</span>
-                  </motion.div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </motion.section>
