@@ -6,7 +6,7 @@ import { supabase } from "../utils/supabaseClient";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-
+import { exportedFormData } from "../pages/Profile";
 // Define API URL
 const apiUrl = import.meta.env.VITE_API_URL || "https://drivigo-server-v2.vercel.app";
 
@@ -861,6 +861,14 @@ function BookingPage() {
                   
                   console.log('Email endpoint:', emailEndpoint);
                   console.log('Email payload:', emailPayload);
+
+                  await axios.post(`${apiUrl}/notify-instructor`, {
+                    instructorId: selectedInstructor.instructor_id,
+                    title: 'New subscription purchased 🎉',
+                    body: `${exportedFormData.name || 'A learner'} booked your course`,
+                    url: `/dashboard`
+                  });
+                  
                   
                   // Send the confirmation email
                   try {

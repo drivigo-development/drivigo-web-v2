@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { LogOut, Moon, Sun } from "lucide-react";
+import EnableNotifications from "./EnableNotifications";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -92,7 +93,7 @@ const Navbar = () => {
             >
               Contact
             </Link>
-
+            <EnableNotifications />
             {/* Conditional Links */}
             {user ? (
               <>

@@ -6,6 +6,7 @@ import { Pencil, Save, X, Award, Book, Clock, Calendar, User, MapPin, Phone, Tim
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import Loader from '../components/Loader';
 import Instructor_Details from '../components/Instructor_Details';
+export let exportedFormData = {};
 
 const Profile = () => {
   const { user } = useAuth();
@@ -72,6 +73,10 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    exportedFormData = formData;
+  }, [formData]);
 
   const fetchBookings = async () => {
     try {
