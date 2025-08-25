@@ -178,6 +178,11 @@ export default function EnableNotificationsSupabase() {
     }
   };
 
+  // Only render the button if the user is an instructor
+  if (user?.user_metadata?.role !== 'instructor') {
+    return null;
+  }
+
   return (
     <button
       onClick={toggleNotifications}
@@ -188,7 +193,7 @@ export default function EnableNotificationsSupabase() {
       aria-label={status === "ready" ? "Disable notifications" : "Enable notifications"}
       title={status === "ready" ? "Disable notifications" : "Enable notifications"}
     >
-      {status === "ready" ? <BellRing size={18} /> : <BellOff size={18} />}
+      {status === "ready" ? <BellRing size={18} /> : <BellOff size={18} />} <span className="lg:hidden" >Notifications</span>
     </button>
   );
 }

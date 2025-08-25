@@ -234,7 +234,7 @@ const Navbar = () => {
               >
                 Contact
               </Link>
-
+              <EnableNotifications />
               {/* Conditional Mobile Links */}
               {user ? (
                 <>
