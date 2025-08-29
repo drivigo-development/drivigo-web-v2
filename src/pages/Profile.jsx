@@ -28,6 +28,7 @@ const Profile = () => {
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [instructorStatus, setInstructorStatus] = useState('pending');
+  const [autoPrompted, setAutoPrompted] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -77,6 +78,22 @@ const Profile = () => {
   useEffect(() => {
     exportedFormData = formData;
   }, [formData]);
+
+  // Helper: determine if learner profile is incomplete
+  const isProfileIncomplete = (p) => {
+    if (!p) return true;
+    const required = [p.name, p.age, p.gender, p.phone];
+    return required.some((v) => !v || (typeof v === 'string' && v.trim() === ''));
+  };
+
+  // Auto-open edit dialog for learners with incomplete profiles (only once per mount)
+  useEffect(() => {
+    if (!autoPrompted && userRole === 'learner' && isProfileIncomplete(profile)) {
+      setDialogOpen(true);
+      setAutoPrompted(true);
+      toast('Please complete your profile to continue booking seamlessly.');
+    }
+  }, [userRole, profile, autoPrompted]);
 
   const fetchBookings = async () => {
     try {
@@ -239,6 +256,21 @@ const Profile = () => {
         {/* Main Content */}
         <div className="lg:p-6 pt-3">
             <div className="space-y-8">
+              {/* Completion Prompt for Learners */}
+              {userRole === 'learner' && isProfileIncomplete(profile) && (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-md flex items-start justify-between">
+                  <div className="pr-4">
+                    <p className="font-medium">Complete your profile</p>
+                    <p className="text-sm mt-1">Add your name, age, gender, and phone number to get better matches and smoother communications.</p>
+                  </div>
+                  <button
+                    onClick={openEditDialog}
+                    className="whitespace-nowrap inline-flex items-center px-3 py-2 rounded-md bg-yellow-500 text-white text-sm font-medium hover:bg-yellow-600"
+                  >
+                    <Pencil size={14} className="mr-1" /> Complete now
+                  </button>
+                </div>
+              )}
               {/* Profile Info */}
               <div>
                 <div className="flex justify-between items-center mb-4">

@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import Loader from '../components/Loader';
-import { Calendar, Edit, Save, Clock, CheckCircle, AlertCircle, Timer, ShieldAlert } from 'lucide-react';
+import { Calendar, Edit, Save, Clock, CheckCircle, AlertCircle, Timer, ShieldAlert, X } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
 import Instructor_Details from '../components/Instructor_Details';
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
 function Dashboard() {
   const { user, signOut } = useAuth();
@@ -26,6 +27,9 @@ function Dashboard() {
   const [instructorUpcomingSessions, setInstructorUpcomingSessions] = useState([]);
   const [instructorSessions, setInstructorSessions] = useState([]);
   const [loadingInstructorSessions, setLoadingInstructorSessions] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [showIncompleteModal, setShowIncompleteModal] = useState(false);
+  const [incompleteAutoPrompted, setIncompleteAutoPrompted] = useState(false);
   const navigate = useNavigate();
 
   // Pagination state
@@ -404,7 +408,7 @@ function Dashboard() {
           // Fetch user role
           const { data: userData, error: userError } = await supabase
             .from('users')
-            .select('role')
+            .select('role, name, age, gender, phone')
             .eq('id', user.id)
             .single();
           
@@ -412,6 +416,7 @@ function Dashboard() {
           
           // Set the role first before calling any functions that depend on it
           setUserRole(userData.role);
+          setProfile(userData);
           
           // If user is an instructor, fetch their availability, sessions, and stats
           if (userData.role === 'instructor') {
@@ -436,6 +441,22 @@ function Dashboard() {
       setLoading(false);
     }
   }, [user]);
+
+  // Helper: check profile completeness for learners
+  const isProfileIncomplete = (p) => {
+    if (!p) return true;
+    const required = [p.name, p.age, p.gender, p.phone];
+    return required.some((v) => !v || (typeof v === 'string' && v.trim() === ''));
+  };
+
+  // Auto-open incomplete profile modal (only once per mount)
+  useEffect(() => {
+    if (!incompleteAutoPrompted && userRole === 'learner' && isProfileIncomplete(profile)) {
+      setShowIncompleteModal(true);
+      setIncompleteAutoPrompted(true);
+      toast('Please complete your profile for a better experience.');
+    }
+  }, [userRole, profile, incompleteAutoPrompted]);
 
   const fetchInstructorAvailability = async () => {
     try {
@@ -1525,19 +1546,66 @@ function Dashboard() {
       </div>
 
       {/* Dashboard Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hidden Instructor_Details component to get status for instructors */}
-        {userRole === 'instructor' && (
-          <div className="hidden">
-            <Instructor_Details 
-              instructorId={user?.id} 
-              onStatusChange={setInstructorStatus} 
-            />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        {/* Incomplete profile banner for learners */}
+        {userRole === 'learner' && isProfileIncomplete(profile) && (
+          <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-md flex items-start justify-between">
+            <div className="pr-4">
+              <p className="font-medium">Complete your profile</p>
+              <p className="text-sm mt-1">To ensure smooth scheduling and communication, please add your name, age, gender, and phone number.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowIncompleteModal(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <X size={18} />
+              </button>
+              <button
+                onClick={() => { setShowIncompleteModal(false); navigate('/profile'); }}
+                className="whitespace-nowrap inline-flex items-center px-3 py-2 rounded-md bg-yellow-500 text-white text-sm font-medium hover:bg-yellow-600"
+              >
+                Complete now
+              </button>
+            </div>
           </div>
         )}
         
         {userRole === 'instructor' ? renderInstructorDashboard() : renderLearnerDashboard()}
       </div>
+
+      {/* Incomplete Profile Modal */}
+      <Dialog open={showIncompleteModal} onClose={() => setShowIncompleteModal(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+            <DialogTitle as="h3" className="text-lg font-medium leading-6 text-gray-900 flex justify-between items-center">
+              Complete Your Profile
+              <button onClick={() => setShowIncompleteModal(false)} className="text-gray-400 hover:text-gray-500">
+                <X size={20} />
+              </button>
+            </DialogTitle>
+            <div className="mt-3 text-sm text-gray-700">
+              To ensure smooth scheduling and communication, please add your name, age, gender, and phone number.
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                onClick={() => setShowIncompleteModal(false)}
+                className="px-4 py-2 text-sm rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Later
+              </button>
+              <button
+                onClick={() => { setShowIncompleteModal(false); navigate('/profile'); }}
+                className="px-4 py-2 text-sm rounded-md bg-primary-600 text-white hover:bg-primary-700"
+              >
+                Complete now
+              </button>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
     </div>
   );
 }
