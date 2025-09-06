@@ -124,12 +124,12 @@ function Home() {
                   whileTap={{ scale: 0.95 }}
                   className="w-full lg:w-1/4 "
                 >
-                  <a
-                    href="#lessons"
+                  <Link
+                    to="/signup"
                     className="bg-primary-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200  mx-auto lg:mx-0 w-1/2 lg:w-full  flex justify-center items-center gap-2"
                   >
-                   Explore Course
-                  </a>
+                   Book Now
+                  </Link>
                 </motion.div>
                 {/* WhatsApp contact button */}
                 <motion.a
